@@ -6,6 +6,7 @@ use Entity\UserLogin;
 use Zend\Http\PhpEnvironment\RemoteAddress;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Router\RouteMatch;
 
 class Module
 {
@@ -13,6 +14,7 @@ class Module
     {
         $eventManager        = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
+        $eventManager->attach(MvcEvent::EVENT_ROUTE, array($this, 'checkSession'), -100);
         $moduleRouteListener->attach($eventManager);
 
         $sm = $e->getApplication()->getServiceManager();
@@ -40,6 +42,31 @@ class Module
             $result = $e->getResult();
             $result->setTerminal(TRUE);
         });
+
+    }
+
+    public function checkSession(MvcEvent $e)
+    {
+        $sm = $e->getApplication()->getServiceManager();
+        $auth = $sm->get('zfcuser_auth_service');
+        $match = $e->getRouteMatch();
+        $list = array('zfcuser/login');
+
+        if (!$match instanceof RouteMatch) {
+            return true;
+        }
+
+        $name = $match->getMatchedRouteName();
+        if (in_array($name, $list)) {
+            return true;
+        }
+
+        // User is authenticated
+        if ($auth->hasIdentity()) {
+            return true;
+        }
+
+        return header('Location: /user/login');
 
     }
 

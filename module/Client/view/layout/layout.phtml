@@ -1,3 +1,6 @@
+<? /* @var $this \Zend\View\Renderer\PhpRenderer */ ?>
+<? $flashMessenger = $this->flashMessenger(); ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,10 +52,9 @@
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
         <section class="content-header">
-            <h1>
-                Dashboard
-                <small>Control panel</small>
-            </h1>
+
+            <h1>Dashboard<small>Control panel</small></h1>
+
             <ol class="breadcrumb">
                 <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
                 <li class="active">Dashboard</li>
@@ -61,7 +63,30 @@
 
         <!-- Main content -->
         <section class="content">
+
+            <? if($this->flashMessenger()->hasSuccessMessages()): ?>
+                <? foreach ($this->flashMessenger()->getSuccessMessages() as $message): ?>
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <h4><i class="icon fa fa-check"></i> Success</h4>
+                        <?= $message ?>
+                    </div>
+                <? endforeach ?>
+            <? endif; ?>
+
+            <? if($this->flashMessenger()->hasErrorMessages()): ?>
+                <? foreach ($this->flashMessenger()->getErrorMessages() as $message): ?>
+                    <div class="alert alert-error alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        <h4><i class="icon fa fa-check"></i> Error</h4>
+                        <?= $message ?>
+                    </div>
+                <? endforeach ?>
+            <? endif; ?>
+
+
             <?=$this->content?>
+
         </section>
         <!-- /.content -->
     </div>

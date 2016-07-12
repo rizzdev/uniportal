@@ -63,7 +63,8 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'Application\Controller\Index' => 'Application\Controller\IndexController'
+            'Application\Controller\Index' => Application\Controller\IndexController::class,
+            'Application\Controller\Common' => Application\Controller\CommonController::class
         ),
     ),
     'view_manager' => array(

@@ -21,7 +21,7 @@ return array(
                     'default' => array(
                         'type'    => 'Segment',
                         'options' => array(
-                            'route'    => '/[:controller[/:action]]',
+                            'route'    => '/[:controller[/:action][/:id]]',
                             'constraints' => array(
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
@@ -43,6 +43,9 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'Client\Controller\Index' => Client\Controller\IndexController::class,
+            'Client\Controller\Portal' => Client\Controller\PortalController::class,
+            'Client\Controller\Controller' => Client\Controller\ControllerController::class,
+            'Client\Controller\Api' => Client\Controller\ApiController::class,
         ),
     ),
     'view_manager' => array(
@@ -60,6 +63,11 @@ return array(
             'zfc-user' => __DIR__ . '/../view',
             __DIR__ . '/../view',
         ),
+        'strategies' => array(
+            'ViewJsonStrategy',
+        ),
+
+
     ),
     // Placeholder for console routes
     'console' => array(
