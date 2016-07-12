@@ -22,13 +22,29 @@
                         <label for="version">Version</label>
                         <input required name="version" type="text" class="form-control" id="version" value="<?=$this->data['version']?>">
                     </div>
+
                     <div class="form-group">
-                        <label for="site">Site</label>
-                        <input required name="site" type="text" class="form-control" id="site" value="<?=$this->data['site']?>">
+
+                        <? if($this->data['site'] == null): ?>
+                            <div class="callout callout-info">
+                                <h4>Important Notice!</h4>
+
+                                <p>You must select a site to use for this controller</p>
+                            </div>
+                        <? endif; ?>
+
+                            <label for="site">Site</label>
+                        <select name="site" class="form-control select2" style="width: 100%;" title="">
+                            <option value="null">Please select a site</option>
+                            <? foreach($this->data['panel']['sites'] as $site): ?>
+                                <option <? if($this->data['site'] == $site->name) echo "selected" ?> value="<?=$site->name?>"><?= $site->name . ' - ' . $site->desc ?></option>
+                            <? endforeach; ?>
+                        </select>
                     </div>
+
                 </div>
                 <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">Update my controller</button>
+                    <button type="submit" class="btn btn-primary">Update Controller Settings</button>
                     <button type="submit" class="btn btn-info" onclick="testControllerConnection(); return false;">Test controller connection</button>
                 </div>
             </form>

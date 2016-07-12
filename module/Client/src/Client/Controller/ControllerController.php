@@ -4,6 +4,7 @@ namespace Client\Controller;
 use Application\Controller\CommonController;
 use Doctrine\ORM\EntityManager;
 use Entity\UserController;
+use UniFi;
 use Zend\View\Model\ViewModel;
 
 class ControllerController extends CommonController
@@ -46,18 +47,17 @@ class ControllerController extends CommonController
     {
         if ($this->posted())
         {
-            $controllerData['controller_base_url'] = $this->params()->fromPost('controller_base_url');
-            $controllerData['controller_username']   = $this->params()->fromPost('controller_username');
-            $controllerData['controller_password']   = $this->params()->fromPost('controller_password');
-            $controllerData['controller_version']    = $this->params()->fromPost('controller_version');
-            $controllerData['controller_site']       = $this->params()->fromPost('controller_site');
+            $controllerData['base_url']   = $this->params()->fromPost('base_url');
+            $controllerData['username']   = $this->params()->fromPost('username');
+            $controllerData['password']   = $this->params()->fromPost('password');
+            $controllerData['version']    = $this->params()->fromPost('version');
 
             $controller = new UserController();
-            $controller->setBaseUrl($controllerData['controller_base_url']);
-            $controller->setUsername($controllerData['controller_username']);
-            $controller->setPassword($controllerData['controller_password']);
-            $controller->setVersion($controllerData['controller_version']);
-            $controller->setSite($controllerData['controller_site']);
+            $controller->setBaseUrl($controllerData['base_url']);
+            $controller->setUsername($controllerData['username']);
+            $controller->setPassword($controllerData['password']);
+            $controller->setVersion($controllerData['version']);
+            $controller->setSite('default');
             $controller->setTimestamp(new \DateTime('now'));
             $controller->setUser($this->currentUser());
 
@@ -66,8 +66,15 @@ class ControllerController extends CommonController
             $em->persist($controller);
             $em->flush();
 
-            $this->flashMessenger()->addSuccessMessage('Your controller has been added');
-            return $this->redirect()->toUrl('/client/controller');
+            $unifi = new UniFi($controller);
+
+            if ($unifi->login()) {
+                $this->flashMessenger()->addSuccessMessage('Successfully connected to panel');
+            } else {
+                $this->flashMessenger()->addErrorMessage('Unable to connect to panel, please verify the following information is correct');
+            }
+
+            return $this->redirect()->toUrl('/client/controller/' . $controller->getId());
 
         }
 
@@ -82,11 +89,54 @@ class ControllerController extends CommonController
         /** @var UserController $controller */
         $controller = $em->getRepository('\Entity\UserController')->find($id);
 
+
         if (is_object($controller)) {
 
             if ($this->currentUser()->getUserId() != $controller->getUser()->getUserId()) {
                 $this->flashMessenger()->addErrorMessage('The controller you attempted to view does not belong to you');
                 return $this->redirect()->toUrl('/client/controller');
+            }
+
+            if ($this->posted()) {
+
+                $controllerData['base_url']   = $this->params()->fromPost('base_url');
+                $controllerData['username']   = $this->params()->fromPost('username');
+                $controllerData['password']   = $this->params()->fromPost('password');
+                $controllerData['version']    = $this->params()->fromPost('version');
+                $controllerData['site']    = $this->params()->fromPost('site');
+
+                $controller->setBaseUrl($controllerData['base_url']);
+                $controller->setUsername($controllerData['username']);
+                $controller->setPassword($controllerData['password']);
+                $controller->setVersion($controllerData['version']);
+                $controller->setSite($controllerData['site']);
+                $em->persist($controller);
+                $em->flush();
+
+            }
+
+            $unifi = new UniFi($controller);
+
+            if ($unifi->login()) {
+                $this->flashMessenger()->addSuccessMessage('Successfully connected to panel');
+
+                $sites = $unifi->list_sites();
+
+                if($controller->getSite() != null)
+                {
+                    $settings = $unifi->list_settings();
+                    $wlanConfig = $unifi->list_wlanconf();
+                }
+
+                $gather = array(
+                    'sites' => $sites,
+                    'settings' => $settings,
+                    'wlanConfig' => $wlanConfig,
+
+                );
+
+            } else {
+                $this->flashMessenger()->addErrorMessage('Unable to connect to panel, please verify the following information is correct');
             }
 
             $controllerInformation = array(
@@ -96,8 +146,11 @@ class ControllerController extends CommonController
                 'password' => $controller->getPassword(),
                 'version' => $controller->getVersion(),
                 'site' => $controller->getSite(),
-                'timestamp' => $controller->getTimestamp()
+                'timestamp' => $controller->getTimestamp(),
+                'panel' => $gather,
             );
+
+
 
             return array('data' => $controllerInformation);
         }

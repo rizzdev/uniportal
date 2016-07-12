@@ -21,7 +21,6 @@ class ApiController extends CommonController
         $controller = $this->currentController();
 
         if (is_object($controller)) {
-
             /** @var UserController $controller */
             $unifi = new UniFi($controller);
 
