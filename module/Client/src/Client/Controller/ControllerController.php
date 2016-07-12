@@ -122,7 +122,7 @@ class ControllerController extends CommonController
 
                 $sites = $unifi->list_sites();
 
-                if($controller->getSite() != null)
+                if($controller->getSite() != null || $controller->getSite() != "null")
                 {
                     $settings = $unifi->list_settings();
                     $wlanConfig = $unifi->list_wlanconf();
@@ -131,7 +131,7 @@ class ControllerController extends CommonController
                 $gather = array(
                     'sites' => $sites,
                     'settings' => $settings,
-                    'wlanConfig' => $wlanConfig,
+                    'wlanConfig' => $wlanConfig
 
                 );
 
