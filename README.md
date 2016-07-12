@@ -10,9 +10,9 @@ Installation
 
 Initial Requirements (recommended)
 ----------------------------
-PHP-FPM
-NGINX
-MYSQL
+    PHP-FPM
+    NGINX
+    MYSQL
 
 Updating doctrine
 --------------------
