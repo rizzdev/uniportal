@@ -646,13 +646,9 @@ class UniFi
     both portal parameters are set to the same value!
     return true on success
     */
-    public function set_guestlogin_settings($portal_enabled, $portal_customized, $redirect_enabled, $redirect_url, $x_password, $expire_number, $expire_unit, $site_id) {
+    public function set_guestlogin_settings($json) {
         if (!$this->is_loggedin) return false;
         $return=false;
-        $json=json_encode(array(  'portal_enabled' => $portal_enabled, 'portal_customized' => $portal_customized,
-            'redirect_enabled' => $redirect_enabled, 'redirect_url' => $redirect_url,
-            'x_password' => $x_password, 'expire_number' => $expire_number,
-            'expire_unit' => $expire_unit, 'site_id' => $site_id), JSON_UNESCAPED_SLASHES);
         $content=$this->exec_curl($this->baseurl."/api/s/".$this->site."/set/setting/guest_access","json=".$json);
         $content_decoded=json_decode($content);
         if (isset($content_decoded->meta->rc)) {
