@@ -11,12 +11,19 @@ namespace Application\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Entity\UserController;
+use UniFi;
+use Zend\Json\Json;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 use ZfcUser\Controller\Plugin\ZfcUserAuthentication;
 
 class CommonController extends AbstractActionController
 {
 
+    const SUCCESS = 'true';
+    const FAIL = 'false';
+
+    private $unifi = null;
     /**
      * @return ZfcUserAuthentication
      */
@@ -31,6 +38,17 @@ class CommonController extends AbstractActionController
     public function posted()
     {
         return $this->getRequest()->isPost();
+    }
+
+    public function createApiCall($status, $message, $data = null)
+    {
+        $model = new JsonModel(array(
+            'success' => $status,
+            'message' => $message,
+            'data' => $data
+        ));
+
+        return $model;
     }
 
     /**
@@ -76,4 +94,26 @@ class CommonController extends AbstractActionController
         }
         
     }
+
+    /**
+     * @return UniFi
+     * @throws \Exception
+     */
+    public function unifi()
+    {
+        if($this->unifi == null)
+        {
+            $controller = $this->currentController();
+            $unifi = new UniFi($controller);
+            if ($unifi->login()) {
+                $this->unifi = $unifi;
+                return $unifi;
+            } else {
+                throw new \Exception('Failed to login to unifi controller');
+            }
+        } else {
+            return $this->unifi;
+        }
+    }
+    
 }
