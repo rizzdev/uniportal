@@ -1,0 +1,78 @@
+<?php
+
+namespace Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * UserController
+ *
+ * @ORM\Table(name="user_controller", uniqueConstraints={@ORM\UniqueConstraint(name="id", columns={"id"})}, indexes={@ORM\Index(name="user", columns={"user"})})
+ * @ORM\Entity
+ */
+class UserController
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="base_url", type="string", length=255, nullable=false)
+     */
+    private $baseUrl;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="username", type="string", length=255, nullable=false)
+     */
+    private $username;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="password", type="string", length=255, nullable=false)
+     */
+    private $password;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="version", type="string", length=255, nullable=false)
+     */
+    private $version;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="site", type="string", length=255, nullable=false)
+     */
+    private $site;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="timestamp", type="datetime", nullable=false)
+     */
+    private $timestamp;
+
+    /**
+     * @var \Entity\User
+     *
+     * @ORM\ManyToOne(targetEntity="Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="user", referencedColumnName="user_id")
+     * })
+     */
+    private $user;
+
+
+}
+
