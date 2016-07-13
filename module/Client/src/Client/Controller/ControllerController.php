@@ -103,7 +103,7 @@ class ControllerController extends CommonController
                 $controllerData['username']   = $this->params()->fromPost('username');
                 $controllerData['password']   = $this->params()->fromPost('password');
                 $controllerData['version']    = $this->params()->fromPost('version');
-                $controllerData['site']    = $this->params()->fromPost('site');
+                $controllerData['site']       = $this->params()->fromPost('site');
 
                 $controller->setBaseUrl($controllerData['base_url']);
                 $controller->setUsername($controllerData['username']);
@@ -149,8 +149,6 @@ class ControllerController extends CommonController
                 'timestamp' => $controller->getTimestamp(),
                 'panel' => $gather,
             );
-
-
 
             return array('data' => $controllerInformation);
         }

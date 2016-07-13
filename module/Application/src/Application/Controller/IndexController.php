@@ -16,7 +16,6 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        echo "This page though";
-        die();
+        $this->redirect()->toUrl('/client');
     }
 }
