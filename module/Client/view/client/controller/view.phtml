@@ -1,8 +1,9 @@
 <div class="row">
+
     <div class="col-md-12">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Edit my controller</h3>
+                <h3 class="box-title">Edit my authentication</h3>
             </div>
             <form method="post" role="form">
                 <div class="box-body">
@@ -24,7 +25,6 @@
                     </div>
 
                     <div class="form-group">
-
                         <? if($this->data['site'] == null || $this->data['site'] == "null"): ?>
                             <div class="callout callout-info">
                                 <h4>Important Notice!</h4>
@@ -32,7 +32,6 @@
                                 <p>You must select a site to use for this controller</p>
                             </div>
                         <? endif; ?>
-
                             <label for="site">Site</label>
                         <select name="site" class="form-control select2" style="width: 100%;" title="">
                             <option value="null">Please select a site</option>
@@ -50,10 +49,77 @@
             </form>
         </div>
     </div>
+
+    <? if($this->data['site'] !== null && $this->data['site'] !== "null"): ?>
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Edit my controller guest settings</h3>
+                </div>
+                <form id="guest_settings_update" method="post" action="/client/api/update-guest-settings/<?=$this->data['id']?>">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="auth">Site</label>
+                            <select name="auth" class="form-control select2" style="width: 100%;" title="">
+                                <option <? if($this->data['panel']['settings']['4']->auth == 'none') echo "selected" ?> value="none">None</option>
+                                <option <? if($this->data['panel']['settings']['4']->auth == 'password') echo "selected" ?> value="password">Password</option>
+                                <option <? if($this->data['panel']['settings']['4']->auth == 'hotspot') echo "selected" ?> value="hotspot">Hotspot</option>
+                                <option <? if($this->data['panel']['settings']['4']->auth == 'custom') echo "selected" ?> value="custom">Portal (Required to use custom portal)</option>
+                            </select>
+                        </div>
+
+                        <div class="checkbox">
+                            <label>
+                                <input name="portal_enabled" <? if($this->data['panel']['settings']['4']->portal_enabled) echo 'checked'?> type="checkbox"> Enable Guest Portal
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="custom_ip">Custom IP</label>
+                            <input required name="custom_ip" type="text" class="form-control" id="custom_ip" value="<?=$this->data['panel']['settings']['4']->custom_ip?>">
+                        </div>
+
+                        <div class="checkbox">
+                            <label>
+                                <input name="portal_use_hostname" <? if($this->data['panel']['settings']['4']->portal_use_hostname) echo 'checked'?> type="checkbox"> Redirect Enabled
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="portal_hostname">Redirect URL</label>
+                            <input required name="portal_hostname" type="text" class="form-control" id="portal_hostname" value="<?=$this->data['panel']['settings']['4']->portal_hostname?>">
+                        </div>
+
+                    </div>
+                    <div class="box-footer">
+                        <input  onclick="" type="submit" class="btn btn-primary" name="Update Controller Guest Settings">
+                    </div>
+                </form>
+            </div>
+        </div>
+    <? endif; ?>
+
 </div>
+
+<script>
+    // prepare the form when the DOM is ready
+    $(document).ready(function() {
+        // bind form using ajaxForm
+        $('#guest_settings_update').ajaxForm({
+            // dataType identifies the expected content type of the server response
+            dataType:  'json',
+
+            // success identifies the function to invoke when the server response
+            // has been received
+            success:   processJson
+        });
+    });
+
+</script>
 
 
 <script>
+
     function testControllerConnection() {
         $.get( "/client/api/test-connection/<?=$this->data['id']?>")
             .done(function( data ) {
