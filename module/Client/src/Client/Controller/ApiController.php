@@ -71,4 +71,24 @@ class ApiController extends CommonController
             'message' => 'Invalid Controller Parameters'
         ));
     }
+
+    public function updateGuestSettingsAction()
+    {
+        $data = array(
+            'auth' => $this->params()->fromPost('auth'),
+            'portal_enabled' => $this->params()->fromPost('portal_enabled'),
+            'custom_ip' => $this->params()->fromPost('custom_ip'),
+            'portal_use_hostname' => $this->params()->fromPost('portal_use_hostname'),
+            'portal_hostname' => $this->params()->fromPost('portal_hostname'),
+        );
+
+
+        $result = $this->unifi()->set_guestlogin_settings(
+            json_encode($data, JSON_UNESCAPED_SLASHES));
+
+        if($result)
+            return $this->createApiCall(true, 'Successfully updated guest settings');
+        else
+            return $this->createApiCall(false, 'Failed to update guest settings');
+    }
 }
