@@ -74,7 +74,7 @@ class ControllerController extends CommonController
                 $this->flashMessenger()->addErrorMessage('Unable to connect to panel, please verify the following information is correct');
             }
 
-            return $this->redirect()->toUrl('/client/controller/' . $controller->getId());
+            return $this->redirect()->toUrl('/client/controller/view/' . $controller->getId());
 
         }
 
