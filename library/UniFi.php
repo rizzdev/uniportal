@@ -649,7 +649,7 @@ class UniFi
     public function set_guestlogin_settings($json) {
         if (!$this->is_loggedin) return false;
         $return=false;
-        $content=$this->exec_curl($this->baseurl."/api/s/".$this->site."/set/setting/guest_access","json=".$json);
+        $content=$this->exec_curl($this->baseurl."/api/s/".$this->site."/set/setting/guest_access", "json=".$json);
         $content_decoded=json_decode($content);
         if (isset($content_decoded->meta->rc)) {
             if ($content_decoded->meta->rc == "ok") {
@@ -657,6 +657,23 @@ class UniFi
             }
         }
         return $return;
+    }
+
+    public function setSettings($collection, $settingsArray)
+    {
+        if(!$this->is_loggedin) return false;
+        $json = json_encode($settingsArray, JSON_UNESCAPED_SLASHES);
+        
+        $response = $this->exec_curl($this->baseurl."/api/s/".$this->site."/set/setting/$collection", "json=$json");
+        $response = json_decode($response);
+
+        if (isset($response->meta->rc)) {
+            if ($response->meta->rc == 'ok') {
+                return true;
+            }
+        }
+
+        return false;
     }
     /*
     rename access point

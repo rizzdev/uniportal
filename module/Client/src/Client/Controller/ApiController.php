@@ -74,17 +74,17 @@ class ApiController extends CommonController
 
     public function updateGuestSettingsAction()
     {
-        $data = array(
-            'auth' => $this->params()->fromPost('auth'),
-            'portal_enabled' => $this->params()->fromPost('portal_enabled'),
-            'custom_ip' => $this->params()->fromPost('custom_ip'),
-            'portal_use_hostname' => $this->params()->fromPost('portal_use_hostname'),
-            'portal_hostname' => $this->params()->fromPost('portal_hostname'),
-        );
+        $data = $this->compilePostParams(array(
+            'params' => array(
+                'auth',
+                'portal_enabled',
+                'custom_ip',
+                'portal_use_hostname',
+                'portal_hostname',
+            )
+        ));
 
-
-        $result = $this->unifi()->set_guestlogin_settings(
-            json_encode($data, JSON_UNESCAPED_SLASHES));
+        $result = $this->unifi()->setSettings('guest_access', $data);
 
         if($result)
             return $this->createApiCall(true, 'Successfully updated guest settings');

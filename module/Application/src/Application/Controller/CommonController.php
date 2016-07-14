@@ -115,5 +115,23 @@ class CommonController extends AbstractActionController
             return $this->unifi;
         }
     }
+
+    public function compilePostParams($array)
+    {
+        $data = $array['params'];
+
+        foreach ($data as $item) {
+
+            $value = $this->params()->fromPost($item);
+
+            if($value == null)
+                $value = false;
+
+            $return[$item] = $value;
+        }
+
+        return $return;
+    }
+
     
 }
