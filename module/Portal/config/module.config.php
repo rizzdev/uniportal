@@ -2,14 +2,10 @@
 return array(
     'router' => array(
         'routes' => array(
-            // The following is a route to simplify getting started creating
-            // new controllers and actions without needing to create a new
-            // module. Simply drop new controllers in, and you can access them
-            // using the path /application/:controller/:action
-            'client' => array(
+            'portal' => array(
                 'type'    => 'Literal',
                 'options' => array(
-                    'route'    => '/guest/s',
+                    'route'    => '/portal',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Portal\Controller',
                         'controller'    => 'Index',
@@ -27,6 +23,7 @@ return array(
                                 'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ),
                             'defaults' => array(
+
                             ),
                         ),
                     ),
@@ -42,7 +39,7 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'Portal\Controller\S' => Portal\Controller\SController::class,
+            'Portal\Controller\Index' => Portal\Controller\IndexController::class,
         ),
     ),
     'view_manager' => array(
@@ -51,6 +48,9 @@ return array(
         'doctype'                  => 'HTML5',
         'template_path_stack' => array(
             __DIR__ . '/../view',
+        ),
+        'strategies' => array(
+            'ViewJsonStrategy',
         ),
     ),
     // Placeholder for console routes

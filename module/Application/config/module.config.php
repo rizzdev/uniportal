@@ -20,10 +20,6 @@ return array(
                     ),
                 ),
             ),
-            // The following is a route to simplify getting started creating
-            // new controllers and actions without needing to create a new
-            // module. Simply drop new controllers in, and you can access them
-            // using the path /application/:controller/:action
             'application' => array(
                 'type'    => 'Literal',
                 'options' => array(
@@ -47,6 +43,34 @@ return array(
                             'defaults' => array(
                             ),
                         ),
+                    ),
+                ),
+            ),
+            'guest.s' => array(
+                'type'    => 'Segment',
+                'options' => array(
+                    'route'    => '/guest/s/[:site]/',
+                    'defaults' => array(
+                        '__NAMESPACE__' => 'Application\Controller',
+                        'controller'    => 'Index',
+                        'action'        => 'index',
+                    ),
+                    'constraints' => array(
+                        'site' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                    ),
+                ),
+            ),
+            'guest.test' => array(
+                'type'    => 'Segment',
+                'options' => array(
+                    'route'    => '/guest/s/auth-test',
+                    'defaults' => array(
+                        '__NAMESPACE__' => 'Application\Controller',
+                        'controller'    => 'Index',
+                        'action'        => 'test',
+                    ),
+                    'constraints' => array(
+                        'site' => '[a-zA-Z][a-zA-Z0-9_-]*',
                     ),
                 ),
             ),

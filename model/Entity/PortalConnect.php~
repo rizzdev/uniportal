@@ -1,0 +1,64 @@
+<?php
+
+namespace Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * PortalConnect
+ *
+ * @ORM\Table(name="portal_connect", indexes={@ORM\Index(name="user_controller_ap", columns={"user_controller_site"})})
+ * @ORM\Entity
+ */
+class PortalConnect
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="client_mac", type="string", length=255, nullable=false)
+     */
+    private $clientMac;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="ssid", type="string", length=255, nullable=false)
+     */
+    private $ssid;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="connection_initial", type="integer", nullable=false)
+     */
+    private $connectionInitial;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="connection_succesful", type="datetime", nullable=true)
+     */
+    private $connectionSuccesful;
+
+    /**
+     * @var \Entity\UserControllerSite
+     *
+     * @ORM\ManyToOne(targetEntity="Entity\UserControllerSite")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="user_controller_site", referencedColumnName="id")
+     * })
+     */
+    private $userControllerSite;
+
+
+}
+

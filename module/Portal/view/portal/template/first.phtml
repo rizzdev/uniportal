@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>BabbTech WiFi</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="first/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="first/css/stylish-portfolio.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="first/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="first/fonts/fonts.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery 2.2.3 -->
+    <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
+
+
+</head>
+
+<body>
+
+<!-- Header -->
+<header id="top" class="header">
+    <div class="text-vertical-center">
+        <h1>BabbTech Wifi</h1>
+        <h3>Free Public WiFi</h3>
+        <br>
+        <? foreach ($this->data['authTypes'] as $authType): ?>
+            <?= $this->partial('portal/template/' . $authType . '.phtml'); ?>
+        <? endforeach; ?>
+    </div>
+</header>
+
+<script>
+    function authorizeClient() {
+        $.get( "/portal/index/authorize", function( data ) {
+            alert( data.message );
+        });
+    }
+</script>
+
+
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+</body>
+</html>

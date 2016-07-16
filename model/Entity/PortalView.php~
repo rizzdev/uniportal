@@ -1,0 +1,57 @@
+<?php
+
+namespace Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * PortalView
+ *
+ * @ORM\Table(name="portal_view", indexes={@ORM\Index(name="user_controller_site", columns={"user_controller_site"})})
+ * @ORM\Entity
+ */
+class PortalView
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="ip", type="string", length=255, nullable=false)
+     */
+    private $ip;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="client_mac", type="string", length=255, nullable=false)
+     */
+    private $clientMac;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="timestamp", type="datetime", nullable=false)
+     */
+    private $timestamp;
+
+    /**
+     * @var \Entity\UserControllerSite
+     *
+     * @ORM\ManyToOne(targetEntity="Entity\UserControllerSite")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="user_controller_site", referencedColumnName="id")
+     * })
+     */
+    private $userControllerSite;
+
+
+}
+

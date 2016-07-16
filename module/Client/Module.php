@@ -50,7 +50,7 @@ class Module
         $sm = $e->getApplication()->getServiceManager();
         $auth = $sm->get('zfcuser_auth_service');
         $match = $e->getRouteMatch();
-        $list = array('zfcuser/login');
+        $list = array('zfcuser/login', 'portal', 'guest.s', 'guest-auth');
 
         if (!$match instanceof RouteMatch) {
             return true;

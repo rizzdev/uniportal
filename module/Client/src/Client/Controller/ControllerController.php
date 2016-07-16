@@ -4,6 +4,8 @@ namespace Client\Controller;
 use Application\Controller\CommonController;
 use Doctrine\ORM\EntityManager;
 use Entity\UserController;
+use Entity\UserControllerAp;
+use Entity\UserControllerSite;
 use UniFi;
 use Zend\View\Model\ViewModel;
 
@@ -83,6 +85,12 @@ class ControllerController extends CommonController
 
     public function viewAction()
     {
+        if ($this->posted()) {
+            if($this->params()->fromPost('visit_site'))
+            {
+                return $this->visitSite();
+            }
+        }
         /** @var EntityManager $em */
         $em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
         $id = $this->params()->fromRoute('id');
@@ -116,26 +124,60 @@ class ControllerController extends CommonController
             }
 
             $unifi = new UniFi($controller);
+            $gather = array();
 
             if ($unifi->login()) {
                 $this->flashMessenger()->addSuccessMessage('Successfully connected to panel');
 
                 $sites = $unifi->list_sites();
 
+                foreach ($sites as $site)
+                {
+                    $userControllerSiteCurrent = $em->getRepository('\Entity\UserControllerSite')->findOneBy(array('siteId' => $site->_id));
+
+                    if($userControllerSiteCurrent instanceof UserControllerSite) {
+                        //Already in database
+                    } else {
+                        $userControllerSite = new UserControllerSite();
+                        $userControllerSite->setUserController($controller);
+                        $userControllerSite->setSiteId($site->_id);
+                        $userControllerSite->setSiteName($site->name);
+                        $em->persist($userControllerSite);
+                        $em->flush();
+                    }
+                }
+
                 if($controller->getSite() != null || $controller->getSite() != "null")
                 {
                     $settings = $unifi->list_settings();
                     $wlanConfig = $unifi->list_wlanconf();
+                    $aps = $unifi->list_aps();
+
+                    foreach ($aps as $ap)
+                    {
+                        $userControllerApCurrent = $em->getRepository('\Entity\UserControllerAp')->findOneBy(array('mac' => $ap->mac));
+                        $activeUserControllerSite = $em->getRepository('\Entity\UserControllerSite')->findOneBy(array('siteId' => $ap->site_id));
+                        if($userControllerApCurrent instanceof UserControllerAp) {
+                            //Already in database
+                        } else {
+                            $userControllerAp = new UserControllerAp();
+                            $userControllerAp->setMac($ap->mac);
+                            $userControllerAp->setUserControllerSite($activeUserControllerSite);
+                            $em->persist($userControllerAp);
+                            $em->flush();
+                        }
+                    }
                 }
 
                 $gather = array(
                     'sites' => $sites,
                     'settings' => $settings,
                     'wlanConfig' => $wlanConfig
-
                 );
 
-            } else {
+            }
+            else
+            {
                 $this->flashMessenger()->addErrorMessage('Unable to connect to panel, please verify the following information is correct');
             }
 
@@ -161,5 +203,6 @@ class ControllerController extends CommonController
     {
         return array();
     }
+
 
 }

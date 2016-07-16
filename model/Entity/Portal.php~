@@ -1,0 +1,74 @@
+<?php
+
+namespace Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Portal
+ *
+ * @ORM\Table(name="portal", uniqueConstraints={@ORM\UniqueConstraint(name="id", columns={"id"})}, indexes={@ORM\Index(name="user_controller_site", columns={"user_controller_site"}), @ORM\Index(name="owner", columns={"owner"})})
+ * @ORM\Entity
+ */
+class Portal
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="subdomain", type="string", length=255, nullable=true)
+     */
+    private $subdomain;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", length=255, nullable=true)
+     */
+    private $title;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="auth_types", type="string", length=255, nullable=false)
+     */
+    private $authTypes;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="header", type="blob", length=65535, nullable=true)
+     */
+    private $header;
+
+    /**
+     * @var \Entity\User
+     *
+     * @ORM\ManyToOne(targetEntity="Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="owner", referencedColumnName="user_id")
+     * })
+     */
+    private $owner;
+
+    /**
+     * @var \Entity\UserControllerSite
+     *
+     * @ORM\ManyToOne(targetEntity="Entity\UserControllerSite")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="user_controller_site", referencedColumnName="id")
+     * })
+     */
+    private $userControllerSite;
+
+
+}
+
