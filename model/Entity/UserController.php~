@@ -52,7 +52,7 @@ class UserController
     /**
      * @var string
      *
-     * @ORM\Column(name="site", type="string", length=255, nullable=false)
+     * @ORM\Column(name="site", type="string", length=255, nullable=true)
      */
     private $site;
 
