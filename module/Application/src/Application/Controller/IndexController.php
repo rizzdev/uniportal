@@ -23,24 +23,30 @@ class IndexController extends CommonController
          * Only for testing to bypass
          */
 
-        $accessPoint['mac'] = 'ac:cf:85:c9:26:33';
-        $accessPoint['ap'] = '44:d9:e7:02:01:e4';
-        $accessPoint['t'] = '1468511482';
-        $accessPoint['url'] = 'http://connectivitycheck.gstatic.com/generate_204';
-        $accessPoint['ssid'] = 'TestSSID';
+        //$accessPoint['mac'] = 'ac:cf:85:c9:26:33';
+        //$accessPoint['ap'] = '44:d9:e7:02:01:e4';
+        //$accessPoint['t'] = '1468511482';
+        //$accessPoint['url'] = 'http://connectivitycheck.gstatic.com/generate_204';
+        //$accessPoint['ssid'] = 'TestSSID';
 
 
         $ap = $em->getRepository('\Entity\UserControllerAp')->findOneBy(array('mac' => $accessPoint['ap']));
 
-        if (!is_object($ap)) {
+        if (!is_object($ap))
+        {
             return $this->redirect()->toUrl('/unknown');
+        }
+
+        if(!is_object($ap->getUserControllerSite()->getPortal()))
+        {
+            return $this->redirect()->toUrl('/controller-has-no-portal-assigned');
         }
 
         $connection = new PortalConnect();
         $connection->setClientMac($accessPoint['mac']);
         $connection->setConnectionInitial($accessPoint['t']);
-        $connection->setUserControllerSite($ap->getUserControllerSite());
         $connection->setSsid($accessPoint['ssid']);
+        $connection->setPortal($ap->getUserControllerSite()->getPortal());
         $em->persist($connection);
         $em->flush();
 

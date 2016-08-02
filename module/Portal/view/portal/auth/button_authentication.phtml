@@ -1,0 +1,21 @@
+<button onclick="button(); return false;" name="authorize" value="true">Connect Now</button>
+
+<script>
+    function button()
+    {
+        $.ajax({
+            type: "POST",
+            url: "/portal/authorize/button",
+            dataType: "json",
+            contentType : "application/json"
+        }).done(function(result) {
+            if(result.success == true) {
+                window.location = "/portal/authorize/authorized";
+            } else {
+                alert('An error has occurred');
+            }
+        }).fail(function() {
+            alert('An error has occurred');
+        });
+    }
+</script>

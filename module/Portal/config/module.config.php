@@ -8,7 +8,7 @@ return array(
                     'route'    => '/portal',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Portal\Controller',
-                        'controller'    => 'Index',
+                        'controller'    => 'Guest',
                         'action'        => 'index',
                     ),
                 ),
@@ -29,17 +29,45 @@ return array(
                     ),
                 ),
             ),
+            'authorize' => array(
+                'type'    => 'Literal',
+                'options' => array(
+                    'route'    => '/portal/authorize',
+                    'defaults' => array(
+                        '__NAMESPACE__' => 'Portal\Controller',
+                        'controller'    => 'Authorize',
+                        'action'        => 'index',
+                    ),
+                ),
+                'may_terminate' => true,
+                'child_routes' => array(
+                    'default' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            'route'    => '[/:action]',
+                            'constraints' => array(
+                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ),
+                            'defaults' => array(
+
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(
-        'abstract_factories' => array(
-            'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-            'Zend\Log\LoggerAbstractServiceFactory',
+        'factories' => array(
+            'Portal\Service\Guest' => Portal\Factory\GuestServiceFactory::class,
+            'Portal\Service\Authorize' => Portal\Factory\AuthorizeServiceFactory::class,
         ),
     ),
     'controllers' => array(
-        'invokables' => array(
-            'Portal\Controller\Index' => Portal\Controller\IndexController::class,
+        'factories' => array(
+            'Portal\Controller\Guest' => Portal\Factory\GuestControllerFactory::class,
+            'Portal\Controller\Authorize' => Portal\Factory\AuthorizeControllerFactory::class,
         ),
     ),
     'view_manager' => array(

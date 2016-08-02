@@ -4,49 +4,41 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Create New Portal</h3>
             </div>
-            <form method="post" role="form">
+            <form id="portal-create" method="post" role="form">
                 <div class="box-body">
 
                     <div class="form-group">
-                        <label for="portal_subdomain">Portal Subdomain</label>
-                        <input name="portal_subdomain" type="text" class="form-control" id="portal_subdomain" placeholder="something.babb.tech">
+                        <label for="subdomain">Portal Subdomain</label>
+                        <input name="subdomain" type="text" class="form-control" id="subdomain" placeholder="" value="">
                     </div>
 
                     <div class="form-group">
-                        <label for="portal_title">Portal Title</label>
-                        <input name="portal_title" type="text" class="form-control" id="portal_title" placeholder="">
+                        <label for="title">Portal Title</label>
+                        <input name="title" type="text" class="form-control" id="title" placeholder="" value="">
                     </div>
 
                     <div class="form-group">
-                        <label for="portal_auth_types">Authentication Method(s)</label>
-                        <select name="portal_auth_types[]" class="form-control select2" multiple="multiple" data-placeholder="Select at least one authentication method" style="width: 100%;">
-                            <option value="automatic_authentication">Automatic Authentication</option>
-                            <option value="button_authentication">Single Button Authentication</option>
-                            <option value="voucher_authentication">Voucher Authentication</option>
-                            <option value="username_password_authentication">User Registration Authentication</option>
-                            <option value="custom_data_authentication">Custom Data Authentication</option>
-                            <option value="social_media_authentication">Social Media Authentication</option>
-                            <option value="payment_authentication">Payment Authentication</option>
+                        <label for=auth_types[]">Authentication Method(s)</label>
+                        <select name="auth_types[]" class="form-control select2" multiple="multiple" data-placeholder="Select at least one authentication method" style="width: 100%;">
+                            <option <? if($this->data['auth_types'] == 'automatic_authentication') echo 'selected'?> value="automatic_authentication">Automatic Authentication</option>
+                            <option <? if($this->data['auth_types'] == 'button_authentication') echo 'selected'?> value="button_authentication">Single Button Authentication</option>
+                            <option disabled="disabled" <? if($this->data['auth_types'] == 'voucher_authentication') echo 'selected'?> value="voucher_authentication">Voucher Authentication</option>
+                            <option disabled="disabled" <? if($this->data['auth_types'] == 'username_password_authentication') echo 'selected'?> value="username_password_authentication">User Registration Authentication</option>
+                            <option disabled="disabled" <? if($this->data['auth_types'] == 'custom_data_authentication') echo 'selected'?> value="custom_data_authentication">Custom Data Authentication</option>
+                            <option disabled="disabled" <? if($this->data['auth_types'] == 'social_media_authentication') echo 'selected'?> value="social_media_authentication">Social Media Authentication</option>
+                            <option disabled="disabled" <? if($this->data['auth_types'] == 'payment_authentication') echo 'selected'?> value="payment_authentication">Payment Authentication</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="portal_header">Portal Welcome</label>
-                        <div id="summernote">Portal Header</div>
+                        <label for="header">Portal Header</label>
+                        <textarea name="header" id="header"></textarea>
                     </div>
-
-
-                    <!--div class="form-group">
-                        <div class="box-body pad">
-                            <label for="portal_heading">Portal Heading</label>
-                            <textarea name="portal_heading" class="textarea" placeholder="Portal Heading" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
-                        </div>
-                    </div-->
 
 
                 </div>
                 <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">Create Portal</button>
+                    <button onclick="createPortal(); return false;" type="submit" class="btn btn-primary">Create Portal</button>
                 </div>
             </form>
         </div>
@@ -55,6 +47,25 @@
 
 
 <script>
+
+    function createPortal() {
+
+        var formData = JSON.stringify($("#portal-create").serializeArray());
+
+        $.ajax({
+            type: "POST",
+            url: "/client/portal/create",
+            data: formData,
+            dataType: "json",
+            contentType : "application/json"
+        }).done(function(result) {
+            processMessage(result);
+        }).fail(function(xhr, status, error) {
+            processMessage(xhr.responseJSON);
+        });
+    }
+
+
     $(document).ready(function() {
 
         //Initialize Select2 Elements
@@ -64,8 +75,6 @@
         $(".my-colorpicker1").colorpicker();
         //color picker with addon
         $(".my-colorpicker2").colorpicker();
-
-
 
         //normal editor
         var toolbar = [
@@ -78,7 +87,7 @@
             ['para', ['ul', 'ol', 'paragraph', 'leftButton', 'centerButton', 'rightButton', 'justifyButton', 'outdentButton', 'indentButton']],
             ['height', ['lineheight']]
         ];
-        $('#summernote').summernote({
+        $('#header').summernote({
             toolbar: toolbar,
             height: 300,
             minHeight: 100,

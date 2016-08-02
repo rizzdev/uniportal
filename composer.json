@@ -17,7 +17,8 @@
         "zendframework/zendframework": "2.3.3",
         "zendframework/zend-developer-tools": "^1.0",
         "doctrine/doctrine-orm-module": "0.8.*",
-        "zf-commons/zfc-user-doctrine-orm": "^1.0"
+        "zf-commons/zfc-user-doctrine-orm": "^1.0",
+        "symfony/serializer" : "dev-master"
     },
     "require-dev": {
         "zf-commons/zfc-user": "^1.4"

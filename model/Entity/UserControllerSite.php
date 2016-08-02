@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * UserControllerSite
  *
- * @ORM\Table(name="user_controller_site", uniqueConstraints={@ORM\UniqueConstraint(name="site_id", columns={"site_id"})}, indexes={@ORM\Index(name="user_controller", columns={"user_controller"})})
+ * @ORM\Table(name="user_controller_site", uniqueConstraints={@ORM\UniqueConstraint(name="site_id", columns={"site_id"})}, indexes={@ORM\Index(name="user_controller", columns={"user_controller"}), @ORM\Index(name="portal", columns={"portal"})})
  * @ORM\Entity
  */
 class UserControllerSite
@@ -34,6 +34,16 @@ class UserControllerSite
      * @ORM\Column(name="site_id", type="string", length=255, nullable=false)
      */
     private $siteId;
+
+    /**
+     * @var \Entity\Portal
+     *
+     * @ORM\ManyToOne(targetEntity="Entity\Portal")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="portal", referencedColumnName="id")
+     * })
+     */
+    private $portal;
 
     /**
      * @var \Entity\UserController
@@ -103,6 +113,30 @@ class UserControllerSite
     public function getSiteId()
     {
         return $this->siteId;
+    }
+
+    /**
+     * Set portal
+     *
+     * @param \Entity\Portal $portal
+     *
+     * @return UserControllerSite
+     */
+    public function setPortal(\Entity\Portal $portal = null)
+    {
+        $this->portal = $portal;
+
+        return $this;
+    }
+
+    /**
+     * Get portal
+     *
+     * @return \Entity\Portal
+     */
+    public function getPortal()
+    {
+        return $this->portal;
     }
 
     /**

@@ -11,6 +11,10 @@
  * file.
  */
 
+$_ENV['cipherKey'] = 'IWijJ&V30D;z0=L8?1UUfns727/4[&_tS:C7QjX~t03K~881H>J8tj1S@5X%]mO';
+
+$_ENV['customPortalIp'] = '74.91.120.57';
+
 return array(
     // ...
 );

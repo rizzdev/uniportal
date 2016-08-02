@@ -1,0 +1,73 @@
+<div class="row">
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-aqua"><i class="fa fa-group"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Live Clients</span>
+                <span id="counter-clients" class="info-box-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Unique Guests</span>
+                <span id="counter-portal-guests" class="info-box-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-red"><i class="fa fa-external-link"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Total Controllers</span>
+                <span id="counter-controller" class="info-box-text"></span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+
+    <!-- fix for small devices only -->
+    <div class="clearfix visible-sm-block"></div>
+
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-green"><i class="fa fa-wifi"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Total AP's</span>
+                <span id="counter-aps" class="info-box-text"></span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+
+
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            type: "GET",
+            url: "/client",
+            dataType: "json",
+            contentType : "application/json"
+        }).then(function(data) {
+            response = data.data;
+            $('#counter-clients').append(response.counter.clients);
+            $('#counter-controller').append(response.counter.controllers);
+            $('#counter-aps').append(response.counter.aps);
+            $('#counter-portal-guests').append(response.counter.portal_guests);
+        });
+    });
+</script>

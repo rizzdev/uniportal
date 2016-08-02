@@ -1,60 +1,84 @@
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">Create New Portal</h3>
             </div>
-            <form method="post" role="form">
+            <form id="portal-update" method="post" role="form">
                 <div class="box-body">
-
                     <div class="form-group">
                         <label for="subdomain">Portal Subdomain</label>
                         <input name="subdomain" type="text" class="form-control" id="subdomain" placeholder="" value="<?=$this->data['subdomain']?>">
                     </div>
-
                     <div class="form-group">
                         <label for="title">Portal Title</label>
                         <input name="title" type="text" class="form-control" id="title" placeholder="" value="<?=$this->data['title']?>">
                     </div>
-
                     <div class="form-group">
-                        <label for="portal_auth_types">Authentication Method(s)</label>
-                        <select name="portal_auth_types[]" class="form-control select2" multiple="multiple" data-placeholder="Select at least one authentication method" style="width: 100%;">
-                            <option <? if($this->data['auth_types'] == 'automatic_authentication') echo 'selected'?> value="automatic_authentication">Automatic Authentication</option>
-                            <option <? if($this->data['auth_types'] == 'button_authentication') echo 'selected'?> value="button_authentication">Single Button Authentication</option>
-                            <option <? if($this->data['auth_types'] == 'voucher_authentication') echo 'selected'?> value="voucher_authentication">Voucher Authentication</option>
-                            <option <? if($this->data['auth_types'] == 'username_password_authentication') echo 'selected'?> value="username_password_authentication">User Registration Authentication</option>
-                            <option <? if($this->data['auth_types'] == 'custom_data_authentication') echo 'selected'?> value="custom_data_authentication">Custom Data Authentication</option>
-                            <option <? if($this->data['auth_types'] == 'social_media_authentication') echo 'selected'?> value="social_media_authentication">Social Media Authentication</option>
-                            <option <? if($this->data['auth_types'] == 'payment_authentication') echo 'selected'?> value="payment_authentication">Payment Authentication</option>
+                        <label for=auth_types[]"">Authentication Method(s)</label>
+                        <select name="auth_types[]" class="form-control select2" multiple="multiple" data-placeholder="Select at least one authentication method" style="width: 100%;">
+                            <option <? if(in_array_r('automatic_authentication', $this->data['auth_types'])) echo 'selected'?> value="automatic_authentication">Automatic Authentication</option>
+                            <option <? if(in_array_r('button_authentication', $this->data['auth_types'])) echo 'selected'?> value="button_authentication">Single Button Authentication</option>
+                            <option disabled="disabled" <? if(in_array_r('voucher_authentication', $this->data['auth_types'])) echo 'selected'?> value="voucher_authentication">Voucher Authentication</option>
+                            <option disabled="disabled" <? if(in_array_r('username_password_authentication', $this->data['auth_types'])) echo 'selected'?> value="username_password_authentication">User Registration Authentication</option>
+                            <option disabled="disabled" <? if(in_array_r('custom_data_authentication', $this->data['auth_types'])) echo 'selected'?> value="custom_data_authentication">Custom Data Authentication</option>
+                            <option disabled="disabled" <? if(in_array_r('social_media_authentication', $this->data['auth_types'])) echo 'selected'?> value="social_media_authentication">Social Media Authentication</option>
+                            <option disabled="disabled" <? if(in_array_r('payment_authentication', $this->data['auth_types'])) echo 'selected'?> value="payment_authentication">Payment Authentication</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label for="portal_header">Portal Header</label>
-                        <div id="summernote"><?=$this->data['header']?></div>
+                        <label for="header">Portal Header</label>
+                        <textarea name="header" id="header"><?=$this->data['header']?></textarea>
                     </div>
-
-
-                    <!--div class="form-group">
-                        <div class="box-body pad">
-                            <label for="portal_heading">Portal Heading</label>
-                            <textarea name="portal_heading" class="textarea" placeholder="Portal Heading" style="width: 100%; height: 200px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
-                        </div>
-                    </div-->
-
-
                 </div>
                 <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">Create Portal</button>
+                    <button onclick="updatePortal(); return false;" type="submit" class="btn btn-primary">Update Portal</button>
                 </div>
             </form>
         </div>
+    </div>
+    <div class="col-md-4">
+        <!-- DONUT CHART -->
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h3 class="box-title">Portal Statistics</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body chart-responsive">
+                <div class="chart" id="portal-stat-pie" style="height: 300px; position: relative;"></div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
     </div>
 </div>
 
 
 <script>
+
+    function updatePortal() {
+
+        var formData = JSON.stringify($("#portal-update").serializeArray());
+
+        $.ajax({
+            type: "POST",
+            url: "/client/portal/update/<?=$this->data['id']?>",
+            data: formData,
+            dataType: "json",
+            contentType : "application/json"
+        }).done(function(result) {
+            processMessage(result);
+        }).fail(function(xhr, status, error) {
+            processMessage(xhr.responseJSON);
+        });
+    }
+
+
     $(document).ready(function() {
 
         //Initialize Select2 Elements
@@ -76,11 +100,35 @@
             ['para', ['ul', 'ol', 'paragraph', 'leftButton', 'centerButton', 'rightButton', 'justifyButton', 'outdentButton', 'indentButton']],
             ['height', ['lineheight']]
         ];
-        $('#summernote').summernote({
+        $('#header').summernote({
             toolbar: toolbar,
             height: 300,
             minHeight: 100,
             defaultBackColor: '#e0e0e0'
+        });
+
+    });
+
+</script>
+
+
+<script>
+    //DONUT CHART
+    $(document).ready(function() {
+        $.ajax({
+            type: "GET",
+            url: "/client/stat/portal-dashboard/<?=$this->data['id']?>",
+            contentType : "application/json"
+        }).done(function(result) {
+            var donut = new Morris.Donut({
+                element: 'portal-stat-pie',
+                resize: true,
+                colors: ["#3c8dbc", "#f56954"],
+                data: result.data.pie_chart,
+                hideHover: 'auto'
+            });
+        }).fail(function(xhr, status, error) {
+            processMessage(xhr.responseJSON);
         });
 
     });

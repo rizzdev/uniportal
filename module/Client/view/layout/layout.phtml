@@ -39,6 +39,10 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
     <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
     <!-- bootstrap wysihtml5 - text editor -->
     <link rel="stylesheet" href="/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+    <!-- notifications -->
+    <link rel="stylesheet" href="/plugins/noty/animate.css">
+    <!-- Morris charts -->
+    <link rel="stylesheet" href="/plugins/morris/morris.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -51,6 +55,10 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
     <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
     <script src="http://malsup.github.com/jquery.form.js"></script>
 
+    <!-- notifications -->
+    <script src="/plugins/noty/packaged/jquery.noty.packaged.min.js"></script>
+
+
     <!-- include summernote css/js-->
     <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
@@ -61,7 +69,7 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
 
 
 </head>
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-blue fixed sidebar-mini">
 <div class="wrapper">
 
     <?= $this->partial('layout/main-header.phtml', ['header' => $this->header]); ?>
@@ -124,7 +132,7 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
     <?= $this->partial('layout/main-footer.phtml', ['footer' => $this->footer]); ?>
 
     <!-- Control Sidebar -->
-    <!--aside-- class="control-sidebar control-sidebar-dark">
+    <aside class="control-sidebar control-sidebar-dark">
         <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
             <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
             <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
@@ -288,7 +296,7 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
                 </form>
             </div>
         </div>
-    </aside-->
+    </aside>
     <!-- /.control-sidebar -->
     <!-- Add the sidebar's background. This div must be placed
          immediately after the control sidebar -->
@@ -297,14 +305,74 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
 <!-- ./wrapper -->
 
 <script>
+
+
+
     function processJson(data) {
         // 'data' is the json object returned from the server
         alert(data.message);
     }
+
     function processFormValidationError(message) {
         alert(message);
     }
+
+    function processMessage(result) {
+        try {
+            if (result.success == true) {
+                for (i = 0; i < result.messages.success.length; i++) {
+                    var success = noty({
+                        type: 'success',
+                        text: result.messages.success[i]
+                    });
+                }
+            } else if (result.success == false) {
+                {
+                    for (i = 0; i < result.messages.errors.length; i++) {
+                        var error = noty({
+                            type: 'error',
+                            text: result.messages.errors[i]
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+        }
+    }
+
 </script>
+
+<script>
+    $.noty.defaults = {
+        layout: 'topRight',
+        theme: 'relax', // or 'relax'
+        type: 'alert',
+        text: '', // can be html or string
+        dismissQueue: true, // If you want to use queue feature set this true
+        template: '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+        animation: {
+            open: {height: 'toggle'}, // or Animate.css class names like: 'animated bounceInLeft'
+            close: {height: 'toggle'}, // or Animate.css class names like: 'animated bounceOutLeft'
+            easing: 'swing',
+            speed: 500 // opening & closing animation speed
+        },
+        timeout: false, // delay for closing event. Set false for sticky notifications
+        force: false, // adds notification to the beginning of queue when set to true
+        modal: false,
+        maxVisible: 5, // you can set max visible notification for dismissQueue true option,
+        killer: false, // for close all notifications before show
+        closeWith: ['click'], // ['click', 'button', 'hover', 'backdrop'] // backdrop click will close all notifications
+        callback: {
+            onShow: function() {},
+            afterShow: function() {},
+            onClose: function() {},
+            afterClose: function() {},
+            onCloseClick: function() {}
+        },
+        buttons: false // an array of buttons
+    };
+</script>
+
 
 <!-- jQuery UI 1.11.4 -->
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
@@ -325,11 +393,13 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
 <script src="/plugins/input-mask/jquery.inputmask.extensions.js"></script>
 <!-- date-range-picker -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-<script src="/plugins/daterangepicker/daterangepicker.js"></script>
+<script src="/plugins/daterazaxasxgepicker/daterangepicker.js"></script>
 <!-- bootstrap datepicker -->
 <script src="/plugins/datepicker/bootstrap-datepicker.js"></script>
 <!-- bootstrap color picker -->
 <script src="/plugins/colorpicker/bootstrap-colorpicker.min.js"></script>
+<!-- PACE -->
+<script src="/plugins/pace/pace.min.js"></script>
 <!-- bootstrap time picker -->
 <script src="/plugins/timepicker/bootstrap-timepicker.min.js"></script>
 <!-- Morris.js charts -->
@@ -353,14 +423,20 @@ use Zend\Mvc\Controller\Plugin\FlashMessenger; ?>
 <script src="/plugins/slimScroll/jquery.slimscroll.min.js"></script>
 <!-- FastClick -->
 <script src="/plugins/fastclick/fastclick.js"></script>
+<!-- Morris.js charts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="/plugins/morris/morris.min.js"></script>
 <!-- AdminLTE App -->
 <script src="/dist/js/app.min.js"></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="/dist/js/pages/dashboard.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="/dist/js/demo.js"></script>
 <!-- bootstrap color picker -->
 <script src="/plugins/colorpicker/bootstrap-colorpicker.min.js"></script>
+
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $(".select2").select2();
+    });
+</script>
 
 </body>
 </html>

@@ -4,7 +4,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Add new controller</h3>
             </div>
-            <form method="post" role="form">
+            <form id="controller-create" method="post" role="form">
                 <div class="box-body">
                     <div class="form-group">
                         <label for="base_url">Base URL</label>
@@ -18,17 +18,33 @@
                         <label for="password">Password</label>
                         <input required name="password" type="password" class="form-control" id="password" placeholder="">
                     </div>
-                    <div class="form-group">
-                        <label for="version">Version</label>
-                        <input required name="version" type="text" class="form-control" id="version" placeholder="4.8.3">
-                    </div>
                 </div>
                 <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">Continue</button>
+                    <button type="submit" onclick="createController(); return false;" class="btn btn-primary">Continue</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<script>
+
+    function createController() {
+
+        var formData = JSON.stringify($("#controller-create").serializeArray());
+
+        $.ajax({
+            type: "POST",
+            url: "/client/controller/create",
+            data: formData,
+            dataType: "json",
+            contentType : "application/json"
+        }).done(function(result) {
+            processMessage(result);
+        }).fail(function(xhr, status, error) {
+            processMessage(xhr.responseJSON);
+        });
+    }
+
+</script>
 

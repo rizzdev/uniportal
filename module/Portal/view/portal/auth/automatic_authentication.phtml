@@ -1,0 +1,18 @@
+<script>
+    $( document ).ready(function() {
+        $.ajax({
+            type: "POST",
+            url: "/portal/authorize/automatic",
+            dataType: "json",
+            contentType : "application/json"
+        }).done(function(result) {
+            if(result.success == true) {
+                window.location = "/portal/authorize/authorized";
+            } else {
+                alert('An error has occurred');
+            }
+        }).fail(function() {
+            alert('An error has occurred');
+        });
+    });
+</script>

@@ -1,115 +1,159 @@
 <div class="row">
-
-    <div class="col-md-12">
+    <div class="col-md-8">
         <div class="box box-primary">
             <div class="box-header with-border">
                 <h3 class="box-title">Edit my authentication</h3>
             </div>
-            <form method="post" role="form">
+            <form id="controller-update" method="post" role="form">
                 <div class="box-body">
                     <div class="form-group">
                         <label for="base_url">Base URL</label>
-                        <input required name="base_url" type="text" class="form-control" id="base_url" value="<?=$this->data['base_url']?>" >
+                        <input required name="base_url" type="text" class="form-control" id="base_url" value="<?=$this->controller['base_url']?>" >
                     </div>
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input required name="username" type="text" class="form-control" id="username" value="<?=$this->data['username']?>">
+                        <input required name="username" type="text" class="form-control" id="username" value="<?=$this->controller['username']?>">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input required name="password" type="password" class="form-control" id="password" value="<?=$this->data['password']?>">
+                        <input required name="password" type="password" class="form-control" id="password" value="<?=$this->controller['password']?>">
                     </div>
-                    <div class="form-group">
-                        <label for="version">Version</label>
-                        <input required name="version" type="text" class="form-control" id="version" value="<?=$this->data['version']?>">
-                    </div>
-
-                    <div class="form-group">
-                        <? if($this->data['site'] == null || $this->data['site'] == "null"): ?>
-                            <div class="callout callout-info">
-                                <h4>Important Notice!</h4>
-
-                                <p>You must select a site to use for this controller</p>
-                            </div>
-                        <? endif; ?>
-                            <label for="site">Site</label>
-                        <select name="site" class="form-control select2" style="width: 100%;" title="">
-                            <option value="null">Please select a site</option>
-                            <? foreach($this->data['panel']['sites'] as $site): ?>
-                                <option <? if($this->data['site'] == $site->name) echo "selected" ?> value="<?=$site->name?>"><?= $site->name . ' - ' . $site->desc ?></option>
-                            <? endforeach; ?>
-                        </select>
-                    </div>
-
                 </div>
                 <div class="box-footer">
-                    <button type="submit" class="btn btn-primary">Update Controller Settings</button>
-                    <button type="submit" class="btn btn-info" onclick="testControllerConnection(); return false;">Test controller connection</button>
-                    <button name="visit_site" value="true" type="submit" class="btn btn-warning">Visit my site</button>
+                    <button  onclick="updateController(); return false;" type="submit" class="btn btn-primary">Update Controller Settings</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <? if($this->data['site'] !== null && $this->data['site'] !== "null"): ?>
-        <div class="col-md-12">
-            <div class="box box-primary">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Edit my controller guest settings</h3>
-                </div>
-                <form id="guest_settings_update" method="post" action="/client/api/update-guest-settings/<?=$this->data['id']?>">
-                    <div class="box-body">
-                        <div class="form-group">
-                            <label for="auth">Site</label>
-                            <select name="auth" class="form-control select2" style="width: 100%;" title="">
-                                <option <? if($this->data['panel']['settings']['4']->auth == 'none') echo "selected" ?> value="none">None</option>
-                                <option <? if($this->data['panel']['settings']['4']->auth == 'password') echo "selected" ?> value="password">Password</option>
-                                <option <? if($this->data['panel']['settings']['4']->auth == 'hotspot') echo "selected" ?> value="hotspot">Hotspot</option>
-                                <option <? if($this->data['panel']['settings']['4']->auth == 'custom') echo "selected" ?> value="custom">Portal (Required to use custom portal)</option>
-                            </select>
-                        </div>
+    <div id="sites" class="col-md-4">
 
-                        <div class="checkbox">
-                            <label>
-                                <input value="true" name="portal_enabled" <? if($this->data['panel']['settings']['4']->portal_enabled) echo 'checked'?> type="checkbox"> Enable Guest Portal
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="custom_ip">Custom IP</label>
-                            <input required name="custom_ip" type="text" class="form-control" id="custom_ip" value="<?=$this->data['panel']['settings']['4']->custom_ip?>">
-                        </div>
-
-                        <div class="checkbox">
-                            <label>
-                                <input value="true" name="portal_use_hostname" <? if($this->data['panel']['settings']['4']->portal_use_hostname) echo 'checked'?> type="checkbox"> Redirect Enabled
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="portal_hostname">Redirect URL</label>
-                            <input required name="portal_hostname" type="text" class="form-control" id="portal_hostname" value="<?=$this->data['panel']['settings']['4']->portal_hostname?>">
-                        </div>
-
-                    </div>
-                    <div class="box-footer">
-                        <input  onclick="" type="submit" class="btn btn-primary" name="Update Controller Guest Settings">
-                    </div>
-                </form>
-            </div>
-        </div>
-    <? endif; ?>
+    </div>
 
 </div>
 
 <script>
     $(document).ready(function() {
-        $('#guest_settings_update').ajaxForm({
-            dataType:  'json',
-            beforeSubmit: validate,
-            success:   processJson
-        });
+            $.ajax({
+                type: "GET",
+                url: "/client/controller/view/<?=$this->controller['id']?>",
+                dataType: "json",
+                contentType : "application/json"
+            }).then(function(data) {
+                var response = data.data;
+                $.each(response.controller.sites, function(k, v) {
+                    var site =  response.controller.sites[k];
+                    var block = '';
+
+                    block += '<div class="box box-widget widget-user-2">';
+                    block += '<div class="widget-user-header bg-blue">';
+                    block += '<div class="widget-user-image">';
+                    block += '<img  src="https://cdn2.iconfinder.com/data/icons/free-mobile-icon-kit/64/Site_Map.png" alt="Site">';
+                    block += '</div>';
+                    block += '<h3 class="widget-user-desc">Site: ' + site['site_name'] + '</h3>';
+                    block += '</div>';
+
+                    block += '<div class="box-footer no-padding">';
+                    block += '<ul class="nav nav-stacked">';
+
+                    var validation = function () {
+                        var messages;
+                        $.ajax({
+                            type: "GET",
+                            url: "/client/site/validate/" + site['id'],
+                            dataType: "json",
+                            contentType : "application/json"
+                        }).success(function(data) {
+                            var response = data.data;
+                            messages = response.messages.errors;
+                            return messages;
+                        });
+                    };
+
+                    console.log(validation);
+                    if(validation instanceof Array) {
+                        $.each(validation, function(k, v) {
+                            block += '<div style="padding-left: 10px; padding-right: 10px;padding-top: 10px;" class="form-group">';
+                            block += '<span style="color: red;">' + v + '</span>';
+                            block += '</div>';
+                        });
+                    }
+
+                    block += '<form id="site-portal-update">';
+                    block += '<div style="padding-left: 10px; padding-right: 10px;padding-top: 10px;" class="form-group">';
+                    block += '<select onchange="updateSitePortal(' + site['id'] + ');" name="portal" class="form-control select2" style="width: 100%;">';
+                    block += '<option selected="selected">Select a Portal (No portal assigned)</option>';
+
+                    $.each(response.portals, function(kp, portal) {
+                        if(site['portal_id'] == portal.id){
+                            block += '<option selected value="' + portal.id + '">' + portal.title + '</option>';
+                        } else {
+                            block += '<option value="' + portal.id + '">' + portal.title + '</option>';
+                        }
+                    });
+
+                    block += '</select>';
+                    block += '</div>';
+                    block += '</form>';
+
+                    $.each(site.aps, function(k, v) {
+                        var ap = site.aps[k];
+                        if(ap['uptime']){
+                            block += '<li><a href="#">' + ap['mac'] + ' - ' + ap['model'] + '<span class="pull-right badge bg-green">Online</span></a></li>';
+                        } else {
+                            block += '<li><a href="#">' + ap['mac'] + ' - ' + ap['model'] + '<span class="pull-right badge bg-red">Offline</span></a></li>';
+                        }
+                    });
+
+                    block += '</ul>';
+                    block += '</div>';
+                    block += '</div>';
+
+                    $('#sites').append(block);
+
+                });
+            });
     });
+</script>
+
+
+
+<script>
+
+    function updateSitePortal(id) {
+
+        var formData = JSON.stringify($("#site-portal-update").serializeArray());
+
+        $.ajax({
+            type: "POST",
+            url: "/client/site/update-portal/" + id,
+            data: formData,
+            dataType: "json",
+            contentType : "application/json"
+        }).done(function(result) {
+            processMessage(result);
+        }).fail(function(xhr, status, error) {
+            processMessage(xhr.responseJSON);
+        });
+
+    }
+
+    function updateController() {
+
+        var formData = JSON.stringify($("#controller-update").serializeArray());
+
+        $.ajax({
+            type: "POST",
+            url: "/client/controller/update/<?=$this->data['id']?>",
+            data: formData,
+            dataType: "json",
+            contentType : "application/json"
+        }).done(function(result) {
+            processMessage(result);
+        }).fail(function(xhr, status, error) {
+            processMessage(xhr.responseJSON);
+        });
+    }
 
     function validate(formData, jqForm, options) {
         var form = jqForm[0];

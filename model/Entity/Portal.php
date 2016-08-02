@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Portal
  *
- * @ORM\Table(name="portal", uniqueConstraints={@ORM\UniqueConstraint(name="id", columns={"id"})}, indexes={@ORM\Index(name="user_controller_site", columns={"user_controller_site"}), @ORM\Index(name="owner", columns={"owner"})})
+ * @ORM\Table(name="portal", uniqueConstraints={@ORM\UniqueConstraint(name="id", columns={"id"})}, indexes={@ORM\Index(name="owner", columns={"owner"})})
  * @ORM\Entity
  */
 class Portal
@@ -38,14 +38,7 @@ class Portal
     /**
      * @var string
      *
-     * @ORM\Column(name="auth_types", type="string", length=255, nullable=false)
-     */
-    private $authTypes;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="header", type="blob", length=65535, nullable=true)
+     * @ORM\Column(name="header", type="text", length=65535, nullable=true)
      */
     private $header;
 
@@ -58,16 +51,6 @@ class Portal
      * })
      */
     private $owner;
-
-    /**
-     * @var \Entity\UserControllerSite
-     *
-     * @ORM\ManyToOne(targetEntity="Entity\UserControllerSite")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_controller_site", referencedColumnName="id")
-     * })
-     */
-    private $userControllerSite;
 
 
 
@@ -130,30 +113,6 @@ class Portal
     }
 
     /**
-     * Set authTypes
-     *
-     * @param string $authTypes
-     *
-     * @return Portal
-     */
-    public function setAuthTypes($authTypes)
-    {
-        $this->authTypes = $authTypes;
-
-        return $this;
-    }
-
-    /**
-     * Get authTypes
-     *
-     * @return string
-     */
-    public function getAuthTypes()
-    {
-        return $this->authTypes;
-    }
-
-    /**
      * Set header
      *
      * @param string $header
@@ -199,29 +158,5 @@ class Portal
     public function getOwner()
     {
         return $this->owner;
-    }
-
-    /**
-     * Set userControllerSite
-     *
-     * @param \Entity\UserControllerSite $userControllerSite
-     *
-     * @return Portal
-     */
-    public function setUserControllerSite(\Entity\UserControllerSite $userControllerSite = null)
-    {
-        $this->userControllerSite = $userControllerSite;
-
-        return $this;
-    }
-
-    /**
-     * Get userControllerSite
-     *
-     * @return \Entity\UserControllerSite
-     */
-    public function getUserControllerSite()
-    {
-        return $this->userControllerSite;
     }
 }

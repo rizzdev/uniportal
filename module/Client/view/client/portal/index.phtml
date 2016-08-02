@@ -2,7 +2,7 @@
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">My Controllers</h3>
+                <h3 class="box-title">My Portals</h3>
 
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
@@ -22,7 +22,7 @@
                     </tr>
                     <? foreach ($this->data as $row): ?>
                         <tr>
-                            <td><a href="/client/portal/view/<?=$row['id']?>"><?=$row['subdomain']?></a> </td>
+                            <td><a href="/client/portal/view/<?=$row['id']?>"><?=$row['title']?></a> </td>
                         </tr>
                     <? endforeach; ?>
                 </table>

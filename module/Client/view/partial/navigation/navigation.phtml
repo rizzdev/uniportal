@@ -1,0 +1,34 @@
+<?php
+/** @var $this \Zend\View\Renderer\PhpRenderer */
+/** @var $page Zend\Navigation\Page\AbstractPage */
+/** @var Zend\Navigation\Page\AbstractPage $page */
+/** @var Zend\Navigation\Page\AbstractPage $child */ ?>
+
+
+<ul class="sidebar-menu">
+    <li class="header">NAVIGATION</li>
+    <? foreach ($this->container as $page): ?>
+        <li class="treeview<? if ( $page->isActive(true) ): echo ' active"'; endif; ?>">
+            <a href="<?= $page->getHref() ?>">
+                <i class="<?= $page->get('icon'); ?>"></i>
+                <span> <?= $page->getLabel(); ?> </span>
+                <span class="pull-right-container">
+                    <? if ($page->hasPages()): echo '<i class="fa fa-angle-left pull-right"></i>'; endif; ?>
+                </span>
+            </a>
+            <? if ($page->hasPages()): ?>
+                <ul class="treeview-menu<?= $page->getActive(true) ? ' menu-open' : '' ?>">
+                    <?php foreach ($page->getPages() as $child):?>
+                        <li class="<? echo $child->getActive() ? ' active' : '' ?>">
+                            <a href="<?= $child->getHref() . $child->get('anchor') ?>">
+                                <i class="<?= $child->get('icon')?>"></i>
+                                <?= $child->getLabel() ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <? endif; ?>
+        </li>
+    <? endforeach; ?>
+</ul>
+

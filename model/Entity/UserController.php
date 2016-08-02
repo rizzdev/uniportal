@@ -45,16 +45,9 @@ class UserController
     /**
      * @var string
      *
-     * @ORM\Column(name="version", type="string", length=255, nullable=false)
+     * @ORM\Column(name="version", type="string", length=255, nullable=true)
      */
     private $version;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="site", type="string", length=255, nullable=true)
-     */
-    private $site;
 
     /**
      * @var \DateTime
@@ -179,30 +172,6 @@ class UserController
     public function getVersion()
     {
         return $this->version;
-    }
-
-    /**
-     * Set site
-     *
-     * @param string $site
-     *
-     * @return UserController
-     */
-    public function setSite($site)
-    {
-        $this->site = $site;
-
-        return $this;
-    }
-
-    /**
-     * Get site
-     *
-     * @return string
-     */
-    public function getSite()
-    {
-        return $this->site;
     }
 
     /**

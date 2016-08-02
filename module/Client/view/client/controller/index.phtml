@@ -22,7 +22,6 @@
                         <th>Base URL</th>
                         <th>Username</th>
                         <th>Version</th>
-                        <th>Site</th>
                         <th>Updated</th>
                     </tr>
                     <? foreach ($this->data as $row): ?>
@@ -31,7 +30,6 @@
                             <td><a href="/client/controller/view/<?=$row['id']?>"><?=$row['base_url']?></a> </td>
                             <td><?=$row['username']?></td>
                             <td><?=$row['version']?></td>
-                            <td><?=$row['site']?></td>
                             <td><?=$row['timestamp']?></td>
                         </tr>
                     <? endforeach; ?>

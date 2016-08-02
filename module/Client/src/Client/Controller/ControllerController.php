@@ -2,207 +2,100 @@
 namespace Client\Controller;
 
 use Application\Controller\CommonController;
+use Client\Service\ControllerService;
+use Client\Service\PortalService;
+use Client\Service\SiteService;
 use Doctrine\ORM\EntityManager;
 use Entity\UserController;
 use Entity\UserControllerAp;
 use Entity\UserControllerSite;
 use UniFi;
+use Zend\Crypt\BlockCipher;
 use Zend\View\Model\ViewModel;
 
 class ControllerController extends CommonController
 {
 
+    protected $controllerService;
+    protected $portalService;
+    protected $siteService;
+
+    public function __construct(ControllerService $controllerService, PortalService $portalService, SiteService $siteService)
+    {
+        $this->controllerService = $controllerService;
+        $this->portalService = $portalService;
+        $this->siteService = $siteService;
+    }
+
     public function indexAction()
     {
-        /** @var EntityManager $em */
-        $em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-        $controllers = $em->getRepository('\Entity\UserController')->findBy(array('user' => $this->currentUser()));
-        $data = array();
-
-        if(is_array($controllers))
-        {
-            /** @var UserController $controller */
-            foreach ($controllers as $controller)
-            {
-                $it = array(
-                    'id' => $controller->getId(),
-                    'user' => $controller->getUser()->getUserId(),
-                    'base_url' => $controller->getBaseUrl(),
-                    'username' => $controller->getUsername(),
-                    'password' => $controller->getPassword(),
-                    'version' => $controller->getVersion(),
-                    'site' => $controller->getSite(),
-                    'timestamp' => $controller->getTimestamp()->getTimestamp()
-                );
-
-                array_push($data, $it);
-            }
-
-            return array('data' => $data);
-        }
-
-
-        return new ViewModel();
+        $controllers = $this->controllerService->userPortalsView($this->currentUser());
+        return array('data' => $controllers);
     }
 
     public function createAction()
     {
-        if ($this->posted())
-        {
-            $controllerData['base_url']   = $this->params()->fromPost('base_url');
-            $controllerData['username']   = $this->params()->fromPost('username');
-            $controllerData['password']   = $this->params()->fromPost('password');
-            $controllerData['version']    = $this->params()->fromPost('version');
-
-            $controller = new UserController();
-            $controller->setBaseUrl($controllerData['base_url']);
-            $controller->setUsername($controllerData['username']);
-            $controller->setPassword($controllerData['password']);
-            $controller->setVersion($controllerData['version']);
-            $controller->setSite('default');
-            $controller->setTimestamp(new \DateTime('now'));
-            $controller->setUser($this->currentUser());
-
-            /** @var EntityManager $em */
-            $em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-            $em->persist($controller);
-            $em->flush();
-
-            $unifi = new UniFi($controller);
-
-            if ($unifi->login()) {
-                $this->flashMessenger()->addSuccessMessage('Successfully connected to panel');
-            } else {
-                $this->flashMessenger()->addErrorMessage('Unable to connect to panel, please verify the following information is correct');
-            }
-
-            return $this->redirect()->toUrl('/client/controller/view/' . $controller->getId());
-
+        if ($this->posted()) {
+            $data = $this->requirePostedJson();
+            $result = $this->controllerService->create($data, $this->currentUser());
+            return $this->createServiceApiResponse($result);
         }
 
         return array();
     }
 
+    public function updateAction()
+    {
+        $controller = $this->currentController();
+        $data = $this->requirePostedJson();
+        $result = $this->controllerService->update($data, $controller);
+        return $this->createServiceApiResponse($result);
+    }
+
     public function viewAction()
     {
-        if ($this->posted()) {
-            if($this->params()->fromPost('visit_site'))
-            {
-                return $this->visitSite();
-            }
-        }
-        /** @var EntityManager $em */
-        $em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
-        $id = $this->params()->fromRoute('id');
-        /** @var UserController $controller */
-        $controller = $em->getRepository('\Entity\UserController')->find($id);
+        $controller = $this->currentController();
 
+        $unifi = new UniFi($controller);
 
-        if (is_object($controller)) {
-
-            if ($this->currentUser()->getUserId() != $controller->getUser()->getUserId()) {
-                $this->flashMessenger()->addErrorMessage('The controller you attempted to view does not belong to you');
-                return $this->redirect()->toUrl('/client/controller');
-            }
-
-            if ($this->posted()) {
-
-                $controllerData['base_url']   = $this->params()->fromPost('base_url');
-                $controllerData['username']   = $this->params()->fromPost('username');
-                $controllerData['password']   = $this->params()->fromPost('password');
-                $controllerData['version']    = $this->params()->fromPost('version');
-                $controllerData['site']       = $this->params()->fromPost('site');
-
-                $controller->setBaseUrl($controllerData['base_url']);
-                $controller->setUsername($controllerData['username']);
-                $controller->setPassword($controllerData['password']);
-                $controller->setVersion($controllerData['version']);
-                $controller->setSite($controllerData['site']);
-                $em->persist($controller);
-                $em->flush();
-
-            }
-
-            $unifi = new UniFi($controller);
-            $gather = array();
-
-            if ($unifi->login()) {
-                $this->flashMessenger()->addSuccessMessage('Successfully connected to panel');
-
-                $sites = $unifi->list_sites();
-
-                foreach ($sites as $site)
-                {
-                    $userControllerSiteCurrent = $em->getRepository('\Entity\UserControllerSite')->findOneBy(array('siteId' => $site->_id));
-
-                    if($userControllerSiteCurrent instanceof UserControllerSite) {
-                        //Already in database
-                    } else {
-                        $userControllerSite = new UserControllerSite();
-                        $userControllerSite->setUserController($controller);
-                        $userControllerSite->setSiteId($site->_id);
-                        $userControllerSite->setSiteName($site->name);
-                        $em->persist($userControllerSite);
-                        $em->flush();
-                    }
-                }
-
-                if($controller->getSite() != null || $controller->getSite() != "null")
-                {
-                    $settings = $unifi->list_settings();
-                    $wlanConfig = $unifi->list_wlanconf();
-                    $aps = $unifi->list_aps();
-
-                    foreach ($aps as $ap)
-                    {
-                        $userControllerApCurrent = $em->getRepository('\Entity\UserControllerAp')->findOneBy(array('mac' => $ap->mac));
-                        $activeUserControllerSite = $em->getRepository('\Entity\UserControllerSite')->findOneBy(array('siteId' => $ap->site_id));
-                        if($userControllerApCurrent instanceof UserControllerAp) {
-                            //Already in database
-                        } else {
-                            $userControllerAp = new UserControllerAp();
-                            $userControllerAp->setMac($ap->mac);
-                            $userControllerAp->setUserControllerSite($activeUserControllerSite);
-                            $em->persist($userControllerAp);
-                            $em->flush();
-                        }
-                    }
-                }
-
-                $gather = array(
-                    'sites' => $sites,
-                    'settings' => $settings,
-                    'wlanConfig' => $wlanConfig
-                );
-
-            }
-            else
-            {
-                $this->flashMessenger()->addErrorMessage('Unable to connect to panel, please verify the following information is correct');
-            }
-
-            $controllerInformation = array(
-                'id' => $controller->getId(),
-                'base_url' => $controller->getBaseUrl(),
-                'username' => $controller->getUsername(),
-                'password' => $controller->getPassword(),
-                'version' => $controller->getVersion(),
-                'site' => $controller->getSite(),
-                'timestamp' => $controller->getTimestamp(),
-                'panel' => $gather,
-            );
-
-            return array('data' => $controllerInformation);
+        if ($unifi->login()) {
+            $this->controllerService->updateLoginCookies($unifi, $controller);
+            $this->controllerService->gatherSites($unifi, $controller);
+            $this->controllerService->gatherAps($unifi, $controller);
         }
 
-        return $this->redirect()->toUrl('/client/controller');
+        $portals = $this->portalService->userPortalsView($this->currentUser());
 
+        if ($this->isApiRequest()) {
+            $result = $this->controllerService->viewDetailed($controller);
+            return $this->createServiceApiResponse($result);
+        }
+
+        return array(
+            'controller' => $this->controllerService->view($controller),
+            'portals' => $portals
+        );
     }
 
     public function removeAction()
     {
         return array();
     }
+
+    public function validateAction()
+    {
+        $controller = $this->currentController();
+        $result = $this->controllerService->validateConfiguration($controller);
+        return $this->createServiceApiResponse($result);
+    }
+
+    public function visitPortalAction()
+    {
+        //Simply here to require authentication to view the portal
+        $controller = $this->currentController();
+        return $this->visitSite();
+    }
+
 
 
 }

@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>BabbTech WiFi</title>
+    <title><?=($this->title)?></title>
 
     <!-- Bootstrap Core CSS -->
     <link href="first/css/bootstrap.min.css" rel="stylesheet">
@@ -39,11 +39,9 @@
 <!-- Header -->
 <header id="top" class="header">
     <div class="text-vertical-center">
-        <h1>BabbTech Wifi</h1>
-        <h3>Free Public WiFi</h3>
-        <br>
-        <? foreach ($this->data['authTypes'] as $authType): ?>
-            <?= $this->partial('portal/template/' . $authType . '.phtml'); ?>
+        <?= ($this->header) ?>
+        <? foreach ($this->auth_types as $authType): ?>
+            <?= $this->partial('portal/auth/' . $authType['auth_type'] . '.phtml'); ?>
         <? endforeach; ?>
     </div>
 </header>

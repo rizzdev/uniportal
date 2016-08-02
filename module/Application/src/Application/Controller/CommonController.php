@@ -14,8 +14,11 @@ use Doctrine\ORM\EntityManager;
 use Entity\Portal;
 use Entity\UserController;
 use UniFi;
+use Zend\Http\Header\ContentType;
+use Zend\Http\Request;
 use Zend\Json\Json;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\Container;
 use Zend\View\Model\JsonModel;
 use ZfcUser\Controller\Plugin\ZfcUserAuthentication;
 use Doctrine\ORM\Query;
@@ -36,6 +39,63 @@ class CommonController extends AbstractActionController
         return $this->zfcUserAuthentication();
     }
 
+    public function setConfig($config)
+    {
+        $this->config = $config;
+    }
+
+    public function isApiRequest()
+    {
+        /** @var Request $request */
+        $request = $this->getRequest();
+
+        /** @var ContentType $contentType */
+        $contentType = $request->getHeaders()->get('Content-Type');
+
+        if (is_object($contentType)) {
+
+            if ($contentType->toString() == 'Content-Type: application/json') {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+
+    public function requirePostedJson()
+    {
+        $json = $this->getRequest()->getContent();
+        $array = json_decode($json, true);
+        $fields = array();
+
+        foreach ($array as $field)
+        {
+            if(@is_array($fields[$field['name']]))
+            {
+                array_push($fields[$field['name']], $field['value']);
+            }
+            else if (isset($fields[$field['name']]))
+            {
+                $previous = $field['name'];
+                $fields[$field['name']] = array($previous, $field['value']);
+            }
+            else
+            {
+                if( strpos($field['name'], '[]') !== false ) {
+                    $fields[$field['name']] = array($field['value']);
+                } else {
+                    $fields[$field['name']] = $field['value'];
+                }
+            }
+
+        }
+
+        return $fields;
+    }
+
+
     /**
      * @return mixed
      */
@@ -44,11 +104,43 @@ class CommonController extends AbstractActionController
         return $this->getRequest()->isPost();
     }
 
+    public function createServiceApiResponse($serviceResponse)
+    {
+        if ($serviceResponse['success']) {
+            $this->getResponse()->setStatusCode(200);
+        } else {
+            $this->getResponse()->setStatusCode(500);
+        }
+
+        $model = new JsonModel($serviceResponse);
+
+        return $model;
+    }
+
     public function createApiCall($status, $message, $data = null)
     {
+        if (is_array($message)) {
+            if(isset($message['service-success'])){
+                $status = $message['service-success'];
+            }
+        }
+
+        if (is_array($data)) {
+            if(isset($data['service-data'])){
+                $data = $data['service-success'];
+            }
+        }
+
+        if ($status) {
+            $this->getResponse()->setStatusCode(200);
+        } else {
+            $this->getResponse()->setStatusCode(500);
+        }
+
+
         $model = new JsonModel(array(
             'success' => $status,
-            'message' => $message,
+            'messages' => $message,
             'data' => $data
         ));
 
@@ -173,50 +265,41 @@ class CommonController extends AbstractActionController
         } else {
             throw new \Exception('Error while compiling portal');
         }
-
-
     }
 
-    public function myPortals($object = false)
+    public function currentSite()
     {
-
-        if ($object) {
-            $mode = Query::HYDRATE_OBJECT;
-        } else
-        {
-            $mode = Query::HYDRATE_ARRAY;
-        }
+        $id = $this->params()->fromRoute('id');
+        $user = $this->currentUser();
 
         /** @var EntityManager $em */
         $em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+        /** @var UserController $controller */
+        $site = $em->getRepository('\Entity\UserControllerSite')->find($id);
 
-        $results = $em
-            ->createQueryBuilder()
-            ->select('p')
-            ->from('\Entity\Portal', 'p')
-            ->where('p.owner = :user')
-            ->setParameter('user', $this->currentUser())
-            ->getQuery()->getResult($mode);
-
-        $data = array();
-
-        /** @var Portal $result */
-        foreach ($results as $result) {
-            $single = array();
-            if(is_object($result))
-                $single = array(
-                    'id' => $result->getId(),
-                    'owner' => $result->getOwner()->getUserId(),
-                    'subdomain' => $result->getSubdomain(),
-                    'auth_types' => json_decode($result->getAuthTypes(), true),
-                    'header' => $result->getHeader(),
-                );
-            array_push($data, $single);
+        if (is_object($site)) {
+            if($site->getUserController()->getUser()->getUserId() != $user->getUserId())
+            {
+                throw new \Exception('Unauthorized');
+            }
+            return $site;
+        } else {
+            throw new \Exception('Error while compiling site');
         }
-
-        return $data;
-
     }
 
+    public function currentGuestPortal()
+    {
+        $apContainer = new Container('ap_container');
+
+        /** @var EntityManager $em */
+        $em = $this->getServiceLocator()->get('doctrine.entitymanager.orm_default');
+        $ap = $em->getRepository('\Entity\UserControllerAp')->findOneBy(array('mac' => $apContainer->ap));
+        if (is_object($ap)) {
+            return $ap->getUserControllerSite()->getPortal();
+        }
+
+        throw new \Exception('Error while compiling guest portal');
+    }
 
 }

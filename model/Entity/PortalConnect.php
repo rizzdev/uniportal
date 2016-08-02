@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * PortalConnect
  *
- * @ORM\Table(name="portal_connect", indexes={@ORM\Index(name="user_controller_ap", columns={"user_controller_site"})})
+ * @ORM\Table(name="portal_connect", indexes={@ORM\Index(name="user_controller_ap", columns={"portal"})})
  * @ORM\Entity
  */
 class PortalConnect
@@ -50,14 +50,14 @@ class PortalConnect
     private $connectionSuccesful;
 
     /**
-     * @var \Entity\UserControllerSite
+     * @var \Entity\Portal
      *
-     * @ORM\ManyToOne(targetEntity="Entity\UserControllerSite")
+     * @ORM\ManyToOne(targetEntity="Entity\Portal")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="user_controller_site", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="portal", referencedColumnName="id")
      * })
      */
-    private $userControllerSite;
+    private $portal;
 
 
 
@@ -168,26 +168,26 @@ class PortalConnect
     }
 
     /**
-     * Set userControllerSite
+     * Set portal
      *
-     * @param \Entity\UserControllerSite $userControllerSite
+     * @param \Entity\Portal $portal
      *
      * @return PortalConnect
      */
-    public function setUserControllerSite(\Entity\UserControllerSite $userControllerSite = null)
+    public function setPortal(\Entity\Portal $portal = null)
     {
-        $this->userControllerSite = $userControllerSite;
+        $this->portal = $portal;
 
         return $this;
     }
 
     /**
-     * Get userControllerSite
+     * Get portal
      *
-     * @return \Entity\UserControllerSite
+     * @return \Entity\Portal
      */
-    public function getUserControllerSite()
+    public function getPortal()
     {
-        return $this->userControllerSite;
+        return $this->portal;
     }
 }

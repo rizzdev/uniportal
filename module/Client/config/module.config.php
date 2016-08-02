@@ -1,5 +1,9 @@
 <?php
+
+
+
 return array(
+    'navigation' => include 'navigation.config.php',
     'router' => array(
         'routes' => array(
             // The following is a route to simplify getting started creating
@@ -12,7 +16,7 @@ return array(
                     'route'    => '/client',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Client\Controller',
-                        'controller'    => 'Index',
+                        'controller'    => 'Dashboard',
                         'action'        => 'index',
                     ),
                 ),
@@ -34,20 +38,31 @@ return array(
             ),
         ),
     ),
-    'service_manager' => array(
-        'abstract_factories' => array(
-            'Zend\Cache\Service\StorageCacheAbstractServiceFactory',
-            'Zend\Log\LoggerAbstractServiceFactory',
-        ),
-    ),
     'controllers' => array(
+        'factories' => array(
+            'Client\Controller\Portal' => Client\Factory\PortalControllerFactory::class,
+            'Client\Controller\Controller' => Client\Factory\ControllerControllerFactory::class,
+            'Client\Controller\Dashboard' => Client\Factory\DashboardControllerFactory::class,
+            'Client\Controller\Account' => Client\Factory\AccountControllerFactory::class,
+            'Client\Controller\Site' => Client\Factory\SiteControllerFactory::class,
+            'Client\Controller\Stat' => Client\Factory\StatControllerFactory::class,
+        ),
         'invokables' => array(
-            'Client\Controller\Index' => Client\Controller\IndexController::class,
-            'Client\Controller\Portal' => Client\Controller\PortalController::class,
-            'Client\Controller\Controller' => Client\Controller\ControllerController::class,
             'Client\Controller\Api' => Client\Controller\ApiController::class,
         ),
     ),
+    'service_manager' => array(
+        'factories' => array(
+            'Client\Service\Portal' => Client\Factory\PortalServiceFactory::class,
+            'Client\Service\Controller' => Client\Factory\ControllerServiceFactory::class,
+            'Client\Service\Dashboard' => Client\Factory\DashboardServiceFactory::class,
+            'Client\Service\Account' => Client\Factory\AccountServiceFactory::class,
+            'Client\Service\Site' => Client\Factory\SiteServiceFactory::class,
+            'Client\Service\Stat' => Client\Factory\StatServiceFactory::class,
+            'Client\Navigation\Dashboard' => Client\Factory\ClientDashboardNavigationFactory::class
+        ),
+    ),
+
     'view_manager' => array(
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
@@ -68,12 +83,5 @@ return array(
         ),
 
 
-    ),
-    // Placeholder for console routes
-    'console' => array(
-        'router' => array(
-            'routes' => array(
-            ),
-        ),
     ),
 );
